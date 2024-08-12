@@ -2,6 +2,7 @@ import { getTokens } from "next-firebase-auth-edge";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { clientConfig, serverConfig } from "../config";
+import { Button } from "@nextui-org/button";
 
 
 export default async function Home() {
@@ -26,6 +27,7 @@ export default async function Home() {
       <p>
         Only <strong>{tokens?.decodedToken.email}</strong> holds the magic key to this kingdom!
       </p>
+      <Button>Press Me</Button>
     </main>
   );
 }
