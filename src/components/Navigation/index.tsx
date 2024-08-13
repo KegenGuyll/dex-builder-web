@@ -1,29 +1,29 @@
 'use client'
 
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@nextui-org/button"
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/navbar"
 import Link from "next/link"
 import { usePathname } from "next/navigation";
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 
+type MenuItem = {
+  friendlyName: string
+  href: string
+}
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
-  const menuItems = [
-    "Profile",
-    "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
-  ];
+
+  const menuItems: MenuItem[] = useMemo(() => [
+    { friendlyName: "Profile", href: `/u/${user?.username}` },
+    { friendlyName: 'My Collection', href: `/u/${user?.username}/collection` },
+    { friendlyName: 'My Decks', href: `/u/${user?.username}/decks` },
+    { friendlyName: 'Sign Out', href: '/logout' }
+  ], [user]);
 
   if (pathname === "/login" || pathname === "/register") return null
 
@@ -74,9 +74,9 @@ const Navigation = () => {
                 index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
               }
               className="w-full"
-              href="#"
+              href={item.href}
             >
-              {item}
+              {item.friendlyName}
             </Link>
           </NavbarMenuItem>
         ))}
