@@ -3,11 +3,13 @@
 import { Button } from "@nextui-org/button"
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/navbar"
 import Link from "next/link"
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useEffect } from "react";
 
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const router = useRouter();
 
   const menuItems = [
     "Profile",
@@ -21,6 +23,10 @@ const Navigation = () => {
     "Help & Feedback",
     "Log Out",
   ];
+
+  useEffect(() => {
+    
+  }, [])
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
