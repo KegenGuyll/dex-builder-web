@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@nextui-org/button"
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/navbar"
 import Link from "next/link"
+import { Avatar } from "@nextui-org/avatar"
 import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 
@@ -19,6 +20,7 @@ const Navigation = () => {
 
 
   const menuItems: MenuItem[] = useMemo(() => [
+    { friendlyName: "Search", href: "/search" },
     { friendlyName: "Profile", href: `/u/${user?.username}` },
     { friendlyName: 'My Collection', href: `/u/${user?.username}/collection` },
     { friendlyName: 'My Decks', href: `/u/${user?.username}/decks` },
@@ -28,47 +30,61 @@ const Navigation = () => {
   if (pathname === "/login" || pathname === "/register") return null
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
         />
         <NavbarBrand>
-          {/* <AcmeLogo /> */}
-          <p className="font-bold text-inherit">ACME</p>
+          <Link href="/">
+            <p className="font-bold text-inherit">DEX BUILDER</p>
+          </Link>
         </NavbarBrand>
       </NavbarContent>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
+        <NavbarItem isActive={pathname === '/search'}>
+          <Link color="foreground" href="/search">
+            Search
           </Link>
         </NavbarItem>
-        <NavbarItem isActive>
-          <Link href="#" aria-current="page">
-            Customers
+        {user && (
+          <NavbarItem isActive={pathname === `/u/${user.username}/collection`}>
+            <Link href={`/u/${user?.username}/collection`} aria-current="page">
+              My Collection
+            </Link>
+          </NavbarItem>
+        )}
+        {user && (
+          <NavbarItem isActive={pathname === `/u/${user.username}/decks`}>
+            <Link color="foreground" href={`/u/${user?.username}/decks`}>
+              My Decks
+            </Link>
+          </NavbarItem>
+        )}
+        {user && (
+        <NavbarItem isActive={pathname === `/u/${user.username}`}>
+          <Link color="foreground" href={`/u/${user.username}`}>
+            <Avatar isBordered={pathname === `/u/${user.username}`} size="md" src={user?.photoURL as string} name={user?.username} />
           </Link>
         </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
+        )}
       </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link href="#">Login</Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
-            Sign Up
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
+      {!user && (
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <Link href="/login">Login</Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Button as={Link} color="primary" href="/register" variant="flat">
+              Sign Up
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+      )}
       <NavbarMenu>
         {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
+          <NavbarMenuItem onClick={() => setIsMenuOpen(false)} key={`${item}-${index}`}>
             <Link
               color={
                 index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
