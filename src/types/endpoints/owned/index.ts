@@ -37,6 +37,18 @@ type UpdateOwnedResponse = BasicOwnedResponse;
 
 type DeleteOwnedResponse = BasicOwnedResponse;
 
+type FindAllOwnedResponse = {
+  owned: Owned[]
+  currentPage: number
+  totalCount: number
+  totalNumberOfPages: number
+}
+
+type FindAllOwnedQuery = {
+  pageNumber: number
+  pageSize: number
+}
+
 
 export type {
   Owned,
@@ -45,5 +57,7 @@ export type {
   CreateOwnedResponse,
   DeleteOwnedResponse,
   UpdateOwnedBody,
-  UpdateOwnedResponse
+  UpdateOwnedResponse,
+  FindAllOwnedQuery,
+  FindAllOwnedResponse
 }
