@@ -9,6 +9,10 @@ import { clientConfig, serverConfig } from "@/config";
 import { filterStandardClaims } from "next-firebase-auth-edge/lib/auth/claims";
 import { User } from "@/context/AuthContext";
 
+import { config } from '@fortawesome/fontawesome-svg-core'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+config.autoAddCss = false
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -73,9 +77,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers user={user}>
+        <Providers user={user} token={tokens?.token || null}>
           <Navigation />
-          {children}
+          <main className="text-foreground bg-background px-4 md:px-8">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>
