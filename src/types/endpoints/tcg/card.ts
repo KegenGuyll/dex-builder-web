@@ -113,7 +113,7 @@ type TCGCard = {
   resistances: Resistances[];
   retreatCost: string[];
   convertedRetreatCost: number;
-  set: CardSet;
+  set: CardSet | CardSet[];
   number: string;
   artist: string;
   rarity: string;

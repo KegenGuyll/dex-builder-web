@@ -39,6 +39,13 @@ export async function generateMetadata({params}: CardPageProps) {
     }
   }
 
+  if(Array.isArray(cardData.data.set)) {
+    return {
+      title: `${cardData.data.name} | ${cardData.data.set[0].series}: ${cardData.data.set[0].name}`,
+      description: `${cardData.data.name} | ${cardData.data.set[0].series}: ${cardData.data.set[0].name}`,
+    }
+  }
+
   return {
     title: `${cardData.data.name} | ${cardData.data.set.series}: ${cardData.data.set.name}`,
     description: `${cardData.data.name} | ${cardData.data.set.series}: ${cardData.data.set.name}`,
@@ -77,10 +84,16 @@ const CardPage = async ({ params }: CardPageProps) => {
           </div>
           <div className="w-full text-center">
             <h1>{cardData.data.name}</h1>
-            <span className="text-sm text-gray-400" >{cardData.data.set.series}: {cardData.data.set.name}</span>
+            {Array.isArray(cardData.data.set) 
+              ? (cardData.data.set).map((set) => (
+                  <span key={set.id} className="text-sm text-gray-400" >{set.series}: {set.name}</span>
+                ))
+              : (<span className="text-sm text-gray-400" >{cardData.data.set.series}: {cardData.data.set.name}</span>)
+            }
           </div>
         </div>
         <GroupButtonOwned
+          notes={ownedData && 'notes' in ownedData ? ownedData.notes : null}
           cardId={params.cardId}
           count={ownedData && 'count' in ownedData ? ownedData.count : 0}
           isOwned={isCardOwned}
@@ -99,8 +112,15 @@ const CardPage = async ({ params }: CardPageProps) => {
         <Divider/>
         <div className="flex flex-col gap-2">
           <InformationCard label="Artist" body={cardData.data.artist} />
-          <InformationCard label="Release Date" body={dayjs(cardData.data.set.releaseDate).format('MMMM DD, YYYY')} />
-          <InformationCard label="Rarity" body={cardData.data.rarity} />
+          {Array.isArray(cardData.data.set) 
+            ? (cardData.data.set).map((set) => (
+                <InformationCard key={set.id} label="Set" body={`${set.series}: ${set.name}`} />
+              ))
+            : (<InformationCard label="Release Date" body={dayjs(cardData.data.set.releaseDate).format('MMMM DD, YYYY')} />)
+          }
+          {cardData.data.rarity && (
+            <InformationCard label="Rarity" body={cardData.data.rarity} />
+          )}
           <InformationCard label="National Number" body={cardData.data.nationalPokedexNumbers.map((v) => v).join(',')} />
           <InformationCard label="Identifier" body={cardData.data.id} />
         </div>

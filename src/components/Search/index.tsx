@@ -5,7 +5,11 @@ import { Input } from '@nextui-org/input'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { FormEvent, useCallback, useEffect, useState } from 'react'
  
-export default function SearchBar() {
+type SearchBarProps = {
+  placeholder?: string
+}
+
+export default function SearchBar({ placeholder }: SearchBarProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -63,7 +67,7 @@ export default function SearchBar() {
           onClear={handleClearSearch}
           value={searchValue} 
           onChange={(e) => setSearchValue(e.currentTarget.value)}  
-          placeholder="Search for cards..." 
+          placeholder={placeholder || "Search for cards..." }
           variant="bordered" 
         />
         <Button type='submit'>Search</Button>

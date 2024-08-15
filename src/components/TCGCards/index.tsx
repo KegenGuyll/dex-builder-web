@@ -1,4 +1,5 @@
 import Image from "next/image";
+import {Image as NextUiImage} from "@nextui-org/image";
 import Link from "next/link";
 
 type TCGCardProps = {
@@ -10,6 +11,7 @@ type TCGCardProps = {
     height: string | number
     width: string | number
   }
+  useNextUiImage?: boolean
 }
 
 type TCGImageProps = {
@@ -17,9 +19,17 @@ type TCGImageProps = {
   alt: string
   height?: string | number
   width?: string | number
+  useNextUiImage?: boolean
 }
 
-const TCGImage: React.FC<TCGImageProps> = ({src, alt, height, width}: TCGImageProps) => {
+const TCGImage: React.FC<TCGImageProps> = ({src, alt, height, width, useNextUiImage}: TCGImageProps) => {
+
+  if (useNextUiImage) {
+    return (
+      <NextUiImage removeWrapper className="aspect-playingCard z-0 w-full h-full object-cover" alt={alt} src={src} />
+    )
+  } 
+
   if(!height || !width) {
     return (
       <div className="relative h-40 md:h-[210px] lg:h-[260px] w-28 md:w-[162px] lg:w-[212px] rounded">
@@ -35,12 +45,12 @@ const TCGImage: React.FC<TCGImageProps> = ({src, alt, height, width}: TCGImagePr
   )
 }
 
-const TCGCard: React.FC<TCGCardProps> = ({ src, cardName, onClick, href, imageSize }: TCGCardProps) => {
+const TCGCard: React.FC<TCGCardProps> = ({ src, cardName, onClick, href, imageSize, useNextUiImage }: TCGCardProps) => {
 
   if(onClick) {
     return (
       <button onClick={onClick}>
-        <TCGImage src={src} alt={cardName} height={imageSize?.height} width={imageSize?.width} />
+        <TCGImage useNextUiImage={useNextUiImage} src={src} alt={cardName} height={imageSize?.height} width={imageSize?.width} />
       </button>
     )
   }
@@ -48,14 +58,14 @@ const TCGCard: React.FC<TCGCardProps> = ({ src, cardName, onClick, href, imageSi
   if(href) {
    return (
       <Link href={href}>
-        <TCGImage src={src} alt={cardName} height={imageSize?.height} width={imageSize?.width} />
+        <TCGImage useNextUiImage={useNextUiImage} src={src} alt={cardName} height={imageSize?.height} width={imageSize?.width} />
       </Link>
     ) 
   };
 
 
   return (
-    <TCGImage src={src} alt={cardName} height={imageSize?.height} width={imageSize?.width} />
+    <TCGImage useNextUiImage={useNextUiImage} src={src} alt={cardName} height={imageSize?.height} width={imageSize?.width} />
   );
 }
 
