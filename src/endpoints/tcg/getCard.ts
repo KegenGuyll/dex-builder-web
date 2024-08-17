@@ -1,5 +1,6 @@
 import { TCG } from "@/contants"
 import { TCGCard } from "@/types/endpoints/tcg/card"
+import { TCGSearchResponse } from "./search"
 
 type TCGCardQuery = {
   q: string | undefined
@@ -9,7 +10,7 @@ type TCGCardQuery = {
   select?: string
 }
 
-type TCGSearchResponse = {
+type TCGSingleCard = {
   data: TCGCard
 }
 
@@ -20,7 +21,7 @@ type TCGError = {
   }
 }
 
-const getTCGCard = async (id: string): Promise<TCGSearchResponse | null | TCGError> => {
+const getTCGCard = async (id: string): Promise<TCGSingleCard | null | TCGError> => {
   const url = `${TCG.baseURL}/cards/${id}`
   const response = await fetch(url, {
     headers: {
@@ -31,6 +32,25 @@ const getTCGCard = async (id: string): Promise<TCGSearchResponse | null | TCGErr
   const data = await response.json()
 
   return data 
+}
+
+const getTCGCardBySetId = async (id: string): Promise<TCGSearchResponse | null | TCGError> => {
+  const url = `${TCG.baseURL}/cards/?q=set.id:${id}&select=id,name,images`
+  const response = await fetch(url, {
+    headers: {
+      'X-Api-Key': TCG.apiKey
+    } as any,
+    cache: 'force-cache'
+  })
+
+  const data = await response.json()
+
+  return data
+}
+
+export {
+  getTCGCard,
+  getTCGCardBySetId
 }
 
 export default getTCGCard

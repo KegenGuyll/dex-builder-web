@@ -9,6 +9,7 @@ import getTokens from "@/util/getTokens"
 import {Divider} from "@nextui-org/divider";
 import AddNotes from "@/components/OwnedCard/AddNotes"
 import { Textarea } from "@nextui-org/input"
+import Link from "next/link"
 
 type CardPageProps = {
   params: {
@@ -86,9 +87,14 @@ const CardPage = async ({ params }: CardPageProps) => {
             <h1>{cardData.data.name}</h1>
             {Array.isArray(cardData.data.set) 
               ? (cardData.data.set).map((set) => (
-                  <span key={set.id} className="text-sm text-gray-400" >{set.series}: {set.name}</span>
+                <Link href={`/sets/${set.id}`} key={set.id} >
+                  <span className="text-sm text-gray-400" >{set.series}: {set.name}</span>
+                </Link>
                 ))
-              : (<span className="text-sm text-gray-400" >{cardData.data.set.series}: {cardData.data.set.name}</span>)
+              : (
+              <Link href={`/sets/${cardData.data.set.id}`} >
+                <span className="text-sm text-gray-400" >{cardData.data.set.series}: {cardData.data.set.name}</span>
+              </Link>)
             }
           </div>
         </div>
