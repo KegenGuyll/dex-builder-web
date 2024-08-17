@@ -21,6 +21,7 @@ const Navigation = () => {
 
   const menuItems: MenuItem[] = useMemo(() => [
     { friendlyName: "Search", href: "/search" },
+    { friendlyName: "Sets", href: "/sets" },
     { friendlyName: "Profile", href: `/u/${user?.username}` },
     { friendlyName: 'My Collection', href: `/u/${user?.username}/collection` },
     { friendlyName: 'My Decks', href: `/u/${user?.username}/decks` },
@@ -46,6 +47,11 @@ const Navigation = () => {
         <NavbarItem isActive={pathname === '/search'}>
           <Link color="foreground" href="/search">
             Search
+          </Link>
+        </NavbarItem>
+        <NavbarItem isActive={pathname === '/sets'}>
+          <Link color="foreground" href="/sets">
+            Sets
           </Link>
         </NavbarItem>
         {user && (
