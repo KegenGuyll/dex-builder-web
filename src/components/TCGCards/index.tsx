@@ -22,7 +22,7 @@ type TCGImageProps = {
   useNextUiImage?: boolean
 }
 
-const TCGImage: React.FC<TCGImageProps> = ({src, alt, height, width, useNextUiImage}: TCGImageProps) => {
+export const TCGImage: React.FC<TCGImageProps> = ({src, alt, height, width, useNextUiImage}: TCGImageProps) => {
 
   if (useNextUiImage) {
     return (
