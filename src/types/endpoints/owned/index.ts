@@ -49,6 +49,11 @@ type FindAllOwnedQuery = {
   pageSize: number
 }
 
+type FindBySetId = {
+  id: string
+  count: number
+}
+
 
 export type {
   Owned,
@@ -59,5 +64,6 @@ export type {
   UpdateOwnedBody,
   UpdateOwnedResponse,
   FindAllOwnedQuery,
-  FindAllOwnedResponse
+  FindAllOwnedResponse,
+  FindBySetId,
 }
