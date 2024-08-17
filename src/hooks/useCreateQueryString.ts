@@ -14,8 +14,17 @@ const useCreateQueryString = () => {
     [searchParams]
   )
 
+  const createQueryStringFromMany = useCallback((params: Record<string, string>) => {
+    const searchParams = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.set(key, value)
+    })
+    return searchParams.toString()
+  }, [])
+
   return {
     createQueryString,
+    createQueryStringFromMany
   }
 };
 
