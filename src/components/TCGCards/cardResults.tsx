@@ -9,19 +9,22 @@ type CardResultsProps = {
 
 const CardResults: React.FC<CardResultsProps> = async ({ searchParams }: CardResultsProps) => {
 
+  const { q, page} = searchParams
+
   const queryPayload = {
-    q: searchParams.q,
-    page: Number(searchParams.page) || 1
+    q,
+    page: Number(page) || 1
   }
 
-  const searchResults = await tcgCardSearch(queryPayload)
+  const cardSearchResults = await tcgCardSearch(queryPayload)
 
-  if(!searchResults || 'error' in searchResults) return null
+
+  if(!cardSearchResults || 'error' in cardSearchResults) return null
 
   return (
     <div className="flex flex-col gap-4 md:gap-8">
       <div className="flex flex-wrap gap-2 justify-center">
-        {searchResults?.data.map((card) => (
+        {cardSearchResults?.data.map((card) => (
           <TCGCard
             href={`/card/${card.id}`}
             key={card.id}
@@ -30,9 +33,9 @@ const CardResults: React.FC<CardResultsProps> = async ({ searchParams }: CardRes
           />
         ))}
       </div>
-      {searchResults && (
+      {cardSearchResults && (
         <div className="w-full flex justify-center">
-         <CardPagination totalResults={Math.ceil(searchResults?.totalCount / 12)} />
+         <CardPagination totalResults={Math.ceil(cardSearchResults?.totalCount / 12)} />
         </div>
       )}
     </div>
