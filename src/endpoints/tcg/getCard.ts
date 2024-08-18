@@ -35,7 +35,7 @@ const getTCGCard = async (id: string): Promise<TCGSingleCard | null | TCGError> 
 }
 
 const getTCGCardBySetId = async (id: string): Promise<TCGSearchResponse | null | TCGError> => {
-  const url = `${TCG.baseURL}/cards/?q=set.id:${id}&select=id,name,images`
+  const url = `${TCG.baseURL}/cards/?q=set.id:${id}&select=id,name,images,cardmarket,supertype`
   const response = await fetch(url, {
     headers: {
       'X-Api-Key': TCG.apiKey
