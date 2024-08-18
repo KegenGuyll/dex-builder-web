@@ -98,7 +98,7 @@ const CardTypeDistribution: React.FC<CardTypeDistributionProps> = ({data}: CardT
     <Card className='h-56'>
       <CardBody>
         <div className="flex flex-col items-start gap-2 justify-center h-full">
-          <h4>Distribution By Kind</h4>
+          <h4 className="flex-grow">Distribution By Kind</h4>
           <Bar data={chartData} options={options} />
         </div>
       </CardBody>
