@@ -30,7 +30,7 @@ const tcgCardSearch = async (query: TCGCardQuery, customQuery?: string, signal?:
   let url = `${TCG.baseURL}/cards`
 
   if(!customQuery) {
-    url = `${url}?q=name:${query.q}*&pageSize=12&page=${query.page || 1}`
+    url = `${url}?q=name:${query.q}*&pageSize=100&page=${query.page || 1}&select=name,id,images`
   } else {
     url = `${url}${customQuery}`
   }

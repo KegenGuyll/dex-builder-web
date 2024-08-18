@@ -35,7 +35,7 @@ const CardResults: React.FC<CardResultsProps> = async ({ searchParams }: CardRes
       </div>
       {cardSearchResults && (
         <div className="w-full flex justify-center">
-         <CardPagination totalResults={Math.ceil(cardSearchResults?.totalCount / 12)} />
+         <CardPagination totalResults={Math.ceil(cardSearchResults?.totalCount / 100)} />
         </div>
       )}
     </div>
