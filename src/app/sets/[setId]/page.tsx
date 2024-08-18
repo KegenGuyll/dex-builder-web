@@ -1,14 +1,17 @@
 import TCGCard from "@/components/TCGCards";
 import findBySetId from "@/endpoints/owned/findBySetId";
 import getTokens from "@/util/getTokens";
-import { Card, CardBody } from "@nextui-org/card"
-import {CircularProgress} from "@nextui-org/progress";
-import dayjs from "dayjs"
 import { PokemonTCG } from "pokemon-tcg-sdk-typescript"
 import { faCheck } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { getTCGCardBySetId } from "@/endpoints/tcg/getCard";
 import { TCGCard as TCGCardType } from "@/types/endpoints/tcg/card";
+import ContextCarousel from "@/components/ContextCarousel";
+import CompletedSet from "@/components/ContextCards/completedSet";
+import MostExpensiveCards from "@/components/ContextCards/mostExpensiveCards";
+import CardTypeDistribution, { CardTypeDistributionData } from "@/components/ContextCards/cardTypeDistribution";
+import findNetWorthBySetId from "@/endpoints/owned/findNetWorthBySetId";
+import MostExpensiveOwned from "@/components/ContextCards/mostExpensiveOwned";
 
 type SetPageProps = {
   params: {
@@ -33,10 +36,11 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
 
   const token = await getTokens()
 
-  const [setData, getCardData, ownedCards] = await Promise.all([
+  const [setData, getCardData, ownedCards, netWorth] = await Promise.all([
     PokemonTCG.findSetByID(params.setId),
     getTCGCardBySetId(params.setId),
-    findBySetId(params.setId, token)
+    findBySetId(params.setId, token),
+    findNetWorthBySetId(params.setId, token)
   ])
 
   const findCardCount = (cardId: string): number => {
@@ -45,12 +49,6 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
     const card = ownedCards.find(card => card.id === cardId)
 
     return card?.count || 0
-  }
-
-  const totalCount = (): number => {
-    if(!ownedCards || 'error' in ownedCards) return 0
-
-    return ownedCards.length;
   }
 
   const cardData = (): TCGCardType[] | null => {
@@ -67,51 +65,97 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
     return getCardData.data
   }
 
+
+  const totalCount = (): number => {
+    const data = cardData();
+
+    if(!ownedCards || 'error' in ownedCards || !data) return 0
+
+    // find all cards that are owned in data
+    const matchedCards = data.filter(card => ownedCards.some(ownedCard => ownedCard.id === card.id))
+
+
+    return matchedCards.length
+  }
+
+
+  // find the 3 most expensive cards in the set
+  const mostExpensiveCards = () => {
+    const data = cardData();
+
+    if(!data) return {
+      totalSetPrice: 0,
+      cards: []
+    }
+
+    const sortedPrices = data.sort((a, b) => (b.cardmarket?.prices?.averageSellPrice || 0) - (a.cardmarket?.prices?.averageSellPrice || 0))
+    const totalSetPrice = data.reduce((acc, card) => acc + (card.cardmarket?.prices?.averageSellPrice || 0), 0)
+
+    const formattedPrices = sortedPrices.map(card => ({
+      id: card.id,
+      name: card.name,
+      images: card.images,
+      price: card.cardmarket?.prices?.averageSellPrice
+    }))
+
+    return {
+      totalSetPrice,
+      cards: formattedPrices.slice(0, 3)
+    }
+  }
+
+  const mostExpensiveOwned = () => {
+    if(!netWorth || 'error' in netWorth) return {
+      totalSetPrice: 0,
+      cards: []
+    }
+
+    const slicedCards = netWorth.cards.slice(0, 3)
+
+    return {
+      totalSetPrice: netWorth.totalAverageNetWorth,
+      cards: slicedCards
+    }
+  }
+
+  const cardTypeDistribution = (): CardTypeDistributionData[] => {
+    const data = cardData();
+
+    if(!data) return []
+
+    const types = data.map(card => card.supertype)
+
+    const typeDistribution = types.reduce((acc, type) => {
+      if(type in acc) {
+        acc[type]++
+      } else {
+        acc[type] = 1
+      }
+
+      return acc
+    }, {} as {[key: string]: number})
+
+    return Object.keys(typeDistribution).map(key => ({kind: key, count: typeDistribution[key]}))
+  }
+
   return (
     <div className="flex flex-col gap-4 lg:gap-8 mt-4 lg:items-center lg:justify-center w-full">
       <h1 className="text-lg lg:text-3xl font-bold">{setData.name}</h1>
-      <Card fullWidth className="max-w-[800px]">
-        <CardBody className="flex flex-row items-center">
-          <div className="flex-grow">
-            <div>
-              <h4>Complete Set</h4>
-              <small className="text-small text-default-500" >{totalCount()} of {setData.total}</small>
-            </div>
-            <div>
-              <h4>Release Date</h4>
-              <small  className="text-small text-default-500">{dayjs(setData.releaseDate).format('MMMM DD, YYYY')}</small>
-            </div>
-          </div>
-          {totalCount() / setData.total * 100 === 100 ? (
-            <CircularProgress
-              classNames={{
-                svg: "w-24 h-24 md:w-36 md:h-36 drop-shadow-md",
-                value: "md:text-3xl text-xl font-semibold text-success-900",
-              }}
-              aria-label="Loading..."
-              size="lg"
-              value={totalCount() / setData.total * 100}
-              color={"success"}
-              showValueLabel={true}
-            />
-          ) : (
-            <CircularProgress
-              classNames={{
-                svg: "w-24 h-24 md:w-36 md:h-36 drop-shadow-md",
-                indicator: "stroke-white",
-                track: "stroke-white/10",
-                value: "md:text-3xl text-xl font-semibold text-white",
-              }}
-              aria-label="Loading..."
-              size="lg"
-              value={totalCount() / setData.total * 100}
-              color={"primary"}
-              showValueLabel={true}
-            />
-          )}
-
-        </CardBody>
-      </Card>
+      <div>
+        <ContextCarousel className='max-w-[900px]'>
+          <CompletedSet
+            countOfCards={totalCount()}
+            totalNumberOfCardsInSet={cardData()?.length || 0}
+            releaseDate={setData.releaseDate}
+            totalSetPrice={mostExpensiveCards().totalSetPrice}
+          />
+          <MostExpensiveCards cards={mostExpensiveCards().cards}/>
+          {mostExpensiveOwned().cards.length > 0 ? (
+            <MostExpensiveOwned cards={mostExpensiveOwned().cards}/>
+          ) : null}
+          <CardTypeDistribution data={cardTypeDistribution()}  />
+        </ContextCarousel>
+      </div>
       {cardData() !== null && (
         <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
           {(cardData() as TCGCardType[]).map((card) => (
