@@ -127,7 +127,7 @@ const CardPage = async ({ params }: CardPageProps) => {
           {cardData.data.rarity && (
             <InformationCard label="Rarity" body={cardData.data.rarity} />
           )}
-          <InformationCard label="National Number" body={cardData.data.nationalPokedexNumbers.map((v) => v).join(',')} />
+          <InformationCard label="National Number" body={cardData.data.nationalPokedexNumbers?.map((v) => v).join(',')} />
           <InformationCard label="Identifier" body={cardData.data.id} />
         </div>
         <Divider/>
