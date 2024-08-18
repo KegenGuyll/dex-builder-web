@@ -31,8 +31,7 @@ const combineRarities = (rarities: string[]): CombinedRarities[] => {
   return rarities.map(rarity => {
 
     if(!rarity) {
-      console.log('Rarity is undefined', rarity)
-      return 'U Rare'
+      return 'Common'
     }
 
     if(rarity.includes('Common')) return 'Common'

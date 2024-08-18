@@ -52,8 +52,6 @@ const tcgSetSearch = async (query: TCGSearchSetsQuery): Promise<TCGSearchSetResp
 
   const url = `${TCG.baseURL}/sets?q=name:${query.q}*&pageSize=12&page=${query.page || 1}`
 
-  console.log('url', url)
-
   const response = await fetch(url, {
     headers: {
       'X-Api-Key': TCG.apiKey

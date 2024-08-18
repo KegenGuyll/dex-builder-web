@@ -124,9 +124,7 @@ const CardRarityDistribution: React.FC<CardRarityDistributionProps>  = ({data}: 
         borderSkipped: false,
       },
     ],
-  }), [data, labels]);
-
-  console.log(chartData)
+  }), [data]);
 
   return (
     <Card className='h-56'>

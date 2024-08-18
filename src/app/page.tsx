@@ -13,10 +13,6 @@ export default async function Home() {
     serviceAccount: serverConfig.serviceAccount,
   });
 
-
-
-  console.log(tokens?.token);
-
   if (!tokens) {
     redirect("/register");
   }
