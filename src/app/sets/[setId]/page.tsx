@@ -12,6 +12,8 @@ import MostExpensiveCards from "@/components/ContextCards/mostExpensiveCards";
 import CardTypeDistribution, { CardTypeDistributionData } from "@/components/ContextCards/cardTypeDistribution";
 import findNetWorthBySetId from "@/endpoints/owned/findNetWorthBySetId";
 import MostExpensiveOwned from "@/components/ContextCards/mostExpensiveOwned";
+import CardRarityDistribution, { CardRarityDistributionData } from "@/components/ContextCards/cardRarityDistrubution";
+import combineRarities from "@/util/combineRarities";
 
 type SetPageProps = {
   params: {
@@ -113,7 +115,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
     const slicedCards = netWorth.cards.slice(0, 3)
 
     return {
-      totalSetPrice: netWorth.totalAverageNetWorth,
+      totalSetPrice: netWorth.totalAveragedNetWorth,
       cards: slicedCards
     }
   }
@@ -138,6 +140,37 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
     return Object.keys(typeDistribution).map(key => ({kind: key, count: typeDistribution[key]}))
   }
 
+  const cardRarityDistribution = (): CardRarityDistributionData[] => {
+    const data = cardData();
+    if(!data) return []
+
+    const rarities = data.map(card => card.rarity)
+
+    rarities.filter(rarity => rarity !== undefined)
+
+    const combinedRarities = combineRarities(rarities);
+
+    const rarityDistribution = combinedRarities.reduce((acc, rarity, currIndex) => {
+      if(acc[rarity]) {
+        acc[rarity] += 1
+      } else {
+        acc[rarity] = 1
+      }
+
+      return acc
+    }, {} as {[key: string]: number})
+
+    return Object.keys(rarityDistribution)
+      .sort((a, b) => {
+      const rarityOrder = ['Common', 'Uncommon', 'Rare', 'U Rare', 'S Rare'];
+      return rarityOrder.indexOf(a) - rarityOrder.indexOf(b);
+      })
+      .map(key => ({
+      rarity: key,
+      count: rarityDistribution[key] as number
+      }));
+  }
+
   return (
     <div className="flex flex-col gap-4 lg:gap-8 mt-4 lg:items-center lg:justify-center w-full">
       <h1 className="text-lg lg:text-3xl font-bold">{setData.name}</h1>
@@ -154,6 +187,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
             <MostExpensiveOwned cards={mostExpensiveOwned().cards}/>
           ) : null}
           <CardTypeDistribution data={cardTypeDistribution()}  />
+          <CardRarityDistribution data={cardRarityDistribution()}/>
         </ContextCarousel>
       </div>
       {cardData() !== null && (
