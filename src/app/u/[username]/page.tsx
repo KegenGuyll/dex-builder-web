@@ -1,24 +1,26 @@
-import getMe from "@/endpoints/user/me";
-import getTokens from "@/util/getTokens";
-import { redirect } from "next/navigation";
+'use client';
+
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@nextui-org/button";
+import dayjs from "dayjs";
+import { redirect, useRouter } from "next/navigation";
 
 
-const UserProfilePage = async () => {
+const UserProfilePage = () => {
+  const {user} = useAuth();
+  const router = useRouter();
 
-  const token = await getTokens();
-
-  if(!token) {
-    redirect("/login");
+  if (!user) {
+    redirect('/login');
   }
 
-  const me = await getMe(token);
-
-  console.log(me)
-
   return (
-    <div className="p-8">
-      <h1>Welcome back {me.username}!</h1>
-      <span>since {me.createdAt}</span>
+    <div className="p-8 flex flex-col gap-4">
+      <h1>Welcome back {user.username}!</h1>
+      <span>existing user since {dayjs(user.createdAt).format('MMMM DD, YYYY')}</span>
+      <div>
+        <Button onClick={() => router.push('/logout')} >Logout</Button>
+      </div>
     </div>
   )
 };
