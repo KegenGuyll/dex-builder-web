@@ -40,7 +40,16 @@ export default function Register() {
         },
         body: JSON.stringify({ role: "USER", username }),
       })
-      router.push("/login");
+
+      const newToken = await user.getIdToken(true)
+
+      await fetch("/api/login", {
+        headers: {
+          Authorization: `Bearer ${newToken}`,
+        },
+      });
+
+      router.push("/");
     } catch (e) {
       const currentUser = getAuth(app).currentUser;
 

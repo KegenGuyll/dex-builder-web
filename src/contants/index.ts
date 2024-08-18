@@ -4,6 +4,11 @@ const TCG = {
   apiKey: process.env.NEXT_PUBLIC_TCG_API_KEY
 }
 
+const DEX_BUILDER_API = {
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+}
+
 export {
-  TCG
+  TCG,
+  DEX_BUILDER_API
 }
