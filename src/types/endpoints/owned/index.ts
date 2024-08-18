@@ -1,4 +1,4 @@
-import { TCGCard } from "../tcg/card"
+import { CardMarketPrices, Images, TCGCard } from "../tcg/card"
 
 type Owned = {
   _id: string
@@ -54,6 +54,19 @@ type FindBySetId = {
   count: number
 }
 
+type OwnedNetWorth = {
+  cardId: string
+  cardName: string
+  images: Images
+  marketPrice: CardMarketPrices;
+  count: number
+}
+
+type FindNetWorthBySetIdResponse = {
+  totalAverageNetWorth: number
+  cards: OwnedNetWorth[]
+}
+
 
 export type {
   Owned,
@@ -66,4 +79,6 @@ export type {
   FindAllOwnedQuery,
   FindAllOwnedResponse,
   FindBySetId,
+  OwnedNetWorth,
+  FindNetWorthBySetIdResponse
 }

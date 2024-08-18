@@ -52,14 +52,21 @@ type Images = {
 };
 
 type TCGPrices = {
-  normal: {
+  normal?: {
     low: number;
     mid: number;
     high: number;
     market: number;
     directLow: number;
   };
-  reverseHolofoil: {
+  reverseHolofoil?: {
+    low: number;
+    mid: number;
+    high: number;
+    market: number;
+    directLow: number;
+  };
+  holofoil?: {
     low: number;
     mid: number;
     high: number;
