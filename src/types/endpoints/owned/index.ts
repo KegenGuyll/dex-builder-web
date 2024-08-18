@@ -21,6 +21,21 @@ type BasicOwnedResponse = {
   updatedAt: string
 }
 
+/**
+ * used when the response search for owned based on username will return all owned cards
+ * @typedef {Object} BasicUserOwnedResponse
+ *
+ */  
+type BasicUserOwnedResponse = {
+  _id: string
+  cardId: string
+  cardSupertype: string
+  cardRarity: string
+  count: number
+  cardName: string
+  images: Images
+}
+
 type FindOneOwnedResponse = Owned;
 
 type CreateOwnedBody = {
@@ -63,7 +78,7 @@ type OwnedNetWorth = {
 }
 
 type FindNetWorthBySetIdResponse = {
-  totalAverageNetWorth: number
+  totalAveragedNetWorth: number
   cards: OwnedNetWorth[]
 }
 
@@ -80,5 +95,6 @@ export type {
   FindAllOwnedResponse,
   FindBySetId,
   OwnedNetWorth,
-  FindNetWorthBySetIdResponse
+  FindNetWorthBySetIdResponse,
+  BasicUserOwnedResponse
 }
