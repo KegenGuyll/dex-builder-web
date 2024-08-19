@@ -72,13 +72,13 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
 
     if(data?.cards.length === 0) return []
 
-    const sortedData = data?.cards.sort((a, b) => b.marketPrice.averageSellPrice - a.marketPrice.averageSellPrice)
+    const sortedData = data?.cards.sort((a, b) => b.marketPrice?.averageSellPrice - a.marketPrice?.averageSellPrice)
 
     return sortedData.slice(0, 3).map(card => ({
       id: card.cardId,
       name: card.cardName,
       images: card.images,
-      price: card.marketPrice.averageSellPrice
+      price: card.marketPrice?.averageSellPrice
     }))
   }
 
