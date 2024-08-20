@@ -15,6 +15,7 @@ config.autoAddCss = false
 
 // Import Swiper styles
 import "swiper/swiper-bundle.css";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -79,6 +80,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+      </head>
       <body className={inter.className}>
         <Providers user={user} token={tokens?.token || null}>
           <Navigation />
