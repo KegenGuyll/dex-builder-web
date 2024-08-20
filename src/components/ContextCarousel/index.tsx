@@ -36,7 +36,7 @@ const ContextCarousel: React.FC<ContextCarouselProps> = ({children, className}: 
 
   return (
     <Swiper
-      className={classNames(className)}
+      className={classNames(className, 'z-0')}
       direction='horizontal'
       init
       spaceBetween={8}

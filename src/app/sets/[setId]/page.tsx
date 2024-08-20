@@ -24,6 +24,66 @@ type SetPageProps = {
   }
 }
 
+type DynamicFilterSearchParams = {
+  name: string | undefined
+  types: string | undefined
+  supertype: string | undefined
+  rarity: string | undefined
+}
+
+const dynamicSetFilter = (data: TCGCardType[], searchParams: DynamicFilterSearchParams): TCGCardType[] => {
+  const filterName = (data: TCGCardType[]) => {
+    const name = searchParams.name
+
+    if(!name) return data;
+
+    return data.filter((item) => {
+      return item.name.toLowerCase().includes(name.toLowerCase())
+    })
+  }
+
+  const filterTypes = (data: TCGCardType[]) => {
+    const types = searchParams.types
+
+    if(!types) return data;
+
+    const typesArray = types.split(',');
+
+    return data.filter((item) => {
+      if(!item.types) return false
+
+      return typesArray.every(type => item.types.includes(type))
+    });
+  }
+
+  const filterSupertype = (data: TCGCardType[]) => {
+    const supertype = searchParams.supertype
+
+    if(!supertype) return data;
+
+    const supertypeArray = supertype.split(',').map(type => type.toLowerCase());
+
+    return data.filter((item) => {
+      return supertypeArray.some(type => item.supertype.toLowerCase() === type.toLowerCase())
+    });
+  }
+
+  const filterRarity = (data: TCGCardType[]) => {
+    const rarity = searchParams.rarity
+
+    if(!rarity) return data;
+
+    const rarityArray = rarity.split(',').map(type => type.toLowerCase());
+
+
+    return data.filter((item) => {
+      return rarityArray.some(type => item.rarity.toLowerCase() === type.toLowerCase())
+    });
+  }
+
+  return filterRarity(filterSupertype(filterTypes(filterName(data))));
+}
+
 
 export async function generateMetadata({params}: SetPageProps) { 
   const setData = await PokemonTCG.findSetByID(params.setId)
@@ -38,7 +98,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
 
   const token = await getTokens()
 
-  const [setData, getCardData, ownedCards, netWorth] = await Promise.all([
+  const [setData, cardDataResponse, ownedCards, netWorth] = await Promise.all([
     PokemonTCG.findSetByID(params.setId),
     getTCGCardBySetId(params.setId),
     findBySetId(params.setId, token),
@@ -53,23 +113,20 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
     return card?.count || 0
   }
 
-  const cardData = (): TCGCardType[] | null => {
-    if(!getCardData || 'error' in getCardData) return null
+  const getCardData = (): TCGCardType[] => {
+    if(!cardDataResponse || 'error' in cardDataResponse) return []
 
-    if(searchParams.q) {
-      const query = searchParams.q.toLowerCase()
-
-      const filteredData = getCardData.data.filter(card => card.name.toLowerCase().includes(query))
-
-      return filteredData
+    if(Object.keys(searchParams).length > 0) {
+      return dynamicSetFilter(cardDataResponse.data, searchParams as any)
     }
 
-    return getCardData.data
+
+    return cardDataResponse.data
   }
 
 
   const totalCount = (): number => {
-    const data = cardData();
+    const data = getCardData();
 
     if(!ownedCards || 'error' in ownedCards || !data) return 0
 
@@ -83,7 +140,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
 
   // find the 3 most expensive cards in the set
   const mostExpensiveCards = () => {
-    const data = cardData();
+    const data = getCardData();
 
     if(!data) return {
       totalSetPrice: 0,
@@ -121,7 +178,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
   }
 
   const cardTypeDistribution = (): CardTypeDistributionData[] => {
-    const data = cardData();
+    const data = getCardData();
 
     if(!data) return []
 
@@ -141,7 +198,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
   }
 
   const cardRarityDistribution = (): CardRarityDistributionData[] => {
-    const data = cardData();
+    const data = getCardData();
     if(!data) return []
 
     const rarities = data.map(card => card.rarity)
@@ -178,7 +235,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
         <ContextCarousel className='max-w-[900px]'>
           <CompletedSet
             countOfCards={totalCount()}
-            totalNumberOfCardsInSet={cardData()?.length || 0}
+            totalNumberOfCardsInSet={getCardData()?.length || 0}
             releaseDate={setData.releaseDate}
             totalSetPrice={mostExpensiveCards().totalSetPrice}
           />
@@ -190,9 +247,9 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
           <CardRarityDistribution data={cardRarityDistribution()}/>
         </ContextCarousel>
       </div>
-      {cardData() !== null && (
+      {getCardData() !== null && (
         <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-          {(cardData() as TCGCardType[]).map((card) => (
+          {(getCardData() as TCGCardType[]).map((card) => (
             <div className="relative" key={card.id} >
               <TCGCard 
                 href={`/card/${card.id}`} 

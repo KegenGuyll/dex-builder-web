@@ -7,22 +7,93 @@ import TCGCard from "@/components/TCGCards"
 import findUserCollection from "@/endpoints/user/username/findCollection"
 import findUserNetWorth from "@/endpoints/user/username/findNetWorth"
 import formatDollarAmount from "@/util/formatDollarAmount"
-import getTokens from "@/util/getTokens"
 import combineRarities from "@/util/combineRarities"
+import { BasicUserOwnedResponse } from "@/types/endpoints/owned"
 
 type CollectionPageProps = {
   params: {
     username: string
   }
   searchParams: {
-    q: string
+    name: string
+    supertype: string
   }
 }
 
-const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => {
-  const token = await getTokens()
-  const { q } = searchParams
+const formatKey = (key: string): keyof BasicUserOwnedResponse => {
+  if(key === 'supertype') return 'cardSupertype';
 
+  if(key === 'rarity') return 'cardRarity';
+
+  if(key === 'name') return 'cardName';
+
+  if(key === 'types') return 'cardType';
+
+  return key as keyof BasicUserOwnedResponse;
+}
+
+type DynamicFilterSearchParams = {
+  name: string | undefined
+  types: string | undefined
+  supertype: string | undefined
+  rarity: string | undefined
+}
+
+const dynamicFilter = (
+  data: BasicUserOwnedResponse[], 
+  searchParams: DynamicFilterSearchParams
+): BasicUserOwnedResponse[] => {
+  const filterName = (data: BasicUserOwnedResponse[]) => {
+    const name = searchParams.name;
+
+    if(!name) return data;
+
+    return data.filter((item) => {
+      return item.cardName.toLowerCase().includes(name.toLowerCase())
+    })
+  }
+
+  const filterTypes = (data: BasicUserOwnedResponse[]) => {
+    const types = searchParams.types;
+
+    if(!types) return data;
+
+    const typesArray = types.split(',');
+
+    return data.filter((item) => {
+      return typesArray.every(type => item.cardType.includes(type))
+    });
+  }
+
+  const filterSuperType = (data: BasicUserOwnedResponse[]) => {
+    const superType = searchParams.supertype;
+
+    if(!superType) return data;
+
+    const supertypeArray = superType.split(',').map(type => type.toLowerCase());
+
+    return data.filter((item) => {
+      return supertypeArray.some(type => item.cardSupertype.toLowerCase() === type.toLowerCase())
+    });
+  }
+
+  const filterRarity = (data: BasicUserOwnedResponse[]) => {
+    const rarity = searchParams.rarity;
+
+    if(!rarity) return data;
+
+    const rarityArray = rarity.split(',').map(type => type.toLowerCase());
+
+    return data.filter((item) => {
+      return rarityArray.some(type => item.cardRarity.toLowerCase() === type.toLowerCase())
+    });
+  }
+
+  return filterRarity(filterSuperType(filterTypes(filterName(data))));
+}
+
+
+const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => {
   const [collectionResponse, netWorthResponse] = await Promise.all([
     findUserCollection(params.username),
     findUserNetWorth(params.username)
@@ -31,12 +102,8 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
   const getUserCollection = () => {
     if(!collectionResponse || 'error' in collectionResponse) return []
 
-    if(q) {
-      const query = q.toLowerCase()
-
-      const filteredData = collectionResponse.filter(card => card.cardName.toLowerCase().includes(query))
-
-      return filteredData
+    if(Object.keys(searchParams).length > 0) {
+      return dynamicFilter(collectionResponse, searchParams as any)
     }
 
     return collectionResponse

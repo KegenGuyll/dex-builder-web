@@ -1,11 +1,9 @@
-import TCGCardSkeleton from "@/components/TCGCards/skeleton"
+import { Spinner } from "@nextui-org/spinner"
 
 const SearchPageLoading = () => {
   return (
-    <div className="flex flex-wrap gap-4 justify-start">
-      {[...Array(10)].map((_, index) => (
-        <TCGCardSkeleton key={index} />
-      ))}
+    <div className="flex justify-center p-8 items-center">
+      <Spinner size="lg" />
     </div>
   )
 }

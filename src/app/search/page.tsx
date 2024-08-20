@@ -3,20 +3,18 @@ import { Suspense } from "react"
 import SearchPageLoading from "./loading"
 
 export type SearchPageProps = {
-  params: {
-    slug: string
-  }
-  searchParams: SearchParams
+  searchParams: SearchPageSearchParams
 }
 
-export type SearchParams = {
-  q: string | undefined
-  page: string | undefined
+export type SearchPageSearchParams = {
+  name: string
+  superType: string
+  page: string
 }
 
 export async function generateMetadata({searchParams}: SearchPageProps) { 
 
-  if(!searchParams.q) {
+  if(!searchParams.name) {
     return {
       title: 'Search Results',
       description: 'Search for your favorite TCG cards'
@@ -24,15 +22,18 @@ export async function generateMetadata({searchParams}: SearchPageProps) {
   }
 
   return {
-    title: `Search Results for ${searchParams.q}`,
-    description: `Search Results for ${searchParams.q}`,
+    title: `Search Results for ${searchParams.name}`,
+    description: `Search Results for ${searchParams.name}`,
   }
 }
 
 const SearchPage = async ({searchParams}: SearchPageProps) => {
+
+  const key = JSON.stringify(searchParams)
+
   return (
     <div className="flex flex-col">
-      <Suspense fallback={<SearchPageLoading/>}>
+      <Suspense key={key} fallback={<SearchPageLoading/>} >
         <CardResults searchParams={searchParams}  />
       </Suspense>
     </div>

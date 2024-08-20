@@ -31,6 +31,7 @@ type BasicUserOwnedResponse = {
   cardId: string
   cardSupertype: string
   cardRarity: string
+  cardType: string[]
   count: number
   cardName: string
   images: Images

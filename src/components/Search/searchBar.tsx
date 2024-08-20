@@ -3,8 +3,11 @@
 import { Button } from '@nextui-org/button'
 import { Input } from '@nextui-org/input'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import useCreateQueryString from '@/hooks/useCreateQueryString'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import SearchParams from './searchParams'
  
 type SearchBarProps = {
   placeholder?: string
@@ -15,18 +18,11 @@ export default function SearchBar({ placeholder }: SearchBarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const { createQueryStringFromMany } = useCreateQueryString()
+  const { createQueryString, deleteQueryString } = useCreateQueryString()
 
   const [searchValue, setSearchValue] = useState('')
 
-  const searchQuery = useMemo(() => searchParams.get('q'), [searchParams])
-
-  const deleteQueryString = useCallback((name: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete(name)
-
-    return params.toString()
-  }, [searchParams]) 
+  const searchQuery = useMemo(() => searchParams.get('name'), [searchParams])
 
   useEffect(() => {
     setSearchValue(searchQuery || '')
@@ -36,29 +32,30 @@ export default function SearchBar({ placeholder }: SearchBarProps) {
     if(e) e.preventDefault()
 
     if(!searchValue) {
-      deleteQueryString('q')
+      deleteQueryString('name')
       return router.push(pathname)
     }
 
 
-    const params = createQueryStringFromMany({
-      q: searchValue,
-    })
+    const params = createQueryString('name', searchValue)
 
     router.push(`${pathname}?${params}`)
-  }, [searchValue, createQueryStringFromMany, router, pathname, deleteQueryString])
+  }, [searchValue, createQueryString, router, pathname, deleteQueryString])
 
   const handleClearSearch = () => {
     setSearchValue('')
     
-    deleteQueryString('q')
+    deleteQueryString('name')
     router.push(pathname)
   }
 
   return (
     <form className='flex w-full justify-center flex-col items-center' onSubmit={handleOnSubmit}>
-      <div className="px-4 pt-4 pb-2 md:p-8 flex items-center gap-4 w-full max-w-[800px]">
+      <div className="pt-4 pb-2 flex items-center gap-4 w-full max-w-[800px]">
         <Input 
+          autoCapitalize='off'
+          autoCorrect='off'
+          startContent={<FontAwesomeIcon icon={faSearch} />}
           isClearable
           onClear={handleClearSearch}
           value={searchValue} 
@@ -67,7 +64,8 @@ export default function SearchBar({ placeholder }: SearchBarProps) {
           variant="bordered" 
         />
         <Button type='submit'>Search</Button>
-      </div> 
+      </div>
+      <SearchParams/>
     </form>
   )
 }

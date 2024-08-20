@@ -18,8 +18,6 @@ const Navigation = () => {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  console.log(user)
-
   const menuItems: MenuItem[] = useMemo(() => [
     { friendlyName: "Search", href: "/search" },
     { friendlyName: "Sets", href: "/sets" },

@@ -1,4 +1,4 @@
-import SearchBar from "@/components/Search"
+import SearchBar from "@/components/Search/searchBar"
 
 export default function SetDetailsLayout({
   children, // will be a page or nested layout

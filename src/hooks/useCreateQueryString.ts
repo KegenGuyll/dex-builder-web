@@ -14,6 +14,16 @@ const useCreateQueryString = () => {
     [searchParams]
   )
 
+  const createTCGQueryString = useCallback(() => {
+    let tcgQuery = ''
+
+    searchParams.forEach((value, key) => {
+      tcgQuery += `${key}:${value} `
+    })
+
+    return tcgQuery
+  }, [searchParams])
+
   const createQueryStringFromMany = useCallback((params: Record<string, string>) => {
     const searchParams = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
@@ -22,9 +32,18 @@ const useCreateQueryString = () => {
     return searchParams.toString()
   }, [])
 
+  const deleteQueryString = useCallback((name: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete(name)
+
+    return params.toString()
+  }, [searchParams]) 
+
   return {
     createQueryString,
-    createQueryStringFromMany
+    createQueryStringFromMany,
+    createTCGQueryString,
+    deleteQueryString
   }
 };
 
