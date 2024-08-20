@@ -7,6 +7,7 @@ export default async function findUserCollection(username: string): Promise<Basi
     headers: {
       'Content-Type': 'application/json',
     },
+    'cache': 'no-cache',
   })
 
   const data = await response.json()

@@ -6,7 +6,8 @@ export default async function findUserNetWorth(username:string): Promise<FindNet
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-    }
+    },
+    'cache': 'no-cache',
   })
 
   const data = await response.json()
