@@ -15,13 +15,13 @@ import { Bar } from 'react-chartjs-2';
 
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-type CardTypeDistributionData = {
+type CardSupertypeDistributionData = {
   kind: string,
   count: number
 }
 
-type CardTypeDistributionProps = {
-  data: CardTypeDistributionData[]
+type CardSupertypeDistributionProps = {
+  data: CardSupertypeDistributionData[]
 }
 
 export const options: any = {
@@ -72,7 +72,7 @@ ChartJS.register(
   ChartDataLabels,
 );
 
-const CardTypeDistribution: React.FC<CardTypeDistributionProps> = ({data}: CardTypeDistributionProps) => {
+const CardSupertypeDistribution: React.FC<CardSupertypeDistributionProps> = ({data}: CardSupertypeDistributionProps) => {
 
   const chartData = useMemo(() => ({
     labels: data.map(d => d.kind),
@@ -106,6 +106,6 @@ const CardTypeDistribution: React.FC<CardTypeDistributionProps> = ({data}: CardT
   )
 }
 
-export type { CardTypeDistributionData }
+export type { CardSupertypeDistributionData }
 
-export default CardTypeDistribution
+export default CardSupertypeDistribution
