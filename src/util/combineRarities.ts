@@ -58,7 +58,9 @@ const combineRarities = (rarities: string[]): CombinedRarities[] => {
 
     if(rarity === 'Ultra Rare Shiny') return 'S Rare'
 
-    if(rarities.includes('Promo')) return 'Promo'
+    if(rarity === 'Promo') return 'Promo'
+
+    console.log('Unknown rarity:', rarity)
 
     return 'U Rare'
   })
