@@ -38,7 +38,7 @@ export default function Register() {
           "Content-Type": "application/json",
           "authorization": authToken,
         },
-        body: JSON.stringify({ role: "USER", username }),
+        body: JSON.stringify({ role: "USER", username, isPublic: true }),
       })
 
       const newToken = await user.getIdToken(true)
