@@ -9,7 +9,7 @@ import { TCGCard as TCGCardType } from "@/types/endpoints/tcg/card";
 import ContextCarousel from "@/components/ContextCarousel";
 import CompletedSet from "@/components/ContextCards/completedSet";
 import MostExpensiveCards from "@/components/ContextCards/mostExpensiveCards";
-import CardTypeDistribution, { CardTypeDistributionData } from "@/components/ContextCards/cardTypeDistribution";
+import CardSupertypeDistribution, { CardSupertypeDistributionData } from "@/components/ContextCards/cardSupertypeDistribution";
 import findNetWorthBySetId from "@/endpoints/owned/findNetWorthBySetId";
 import MostExpensiveOwned from "@/components/ContextCards/mostExpensiveOwned";
 import CardRarityDistribution, { CardRarityDistributionData } from "@/components/ContextCards/cardRarityDistrubution";
@@ -177,7 +177,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
     }
   }
 
-  const cardTypeDistribution = (): CardTypeDistributionData[] => {
+  const cardTypeDistribution = (): CardSupertypeDistributionData[] => {
     const data = getCardData();
 
     if(!data) return []
@@ -243,7 +243,7 @@ const SetPage = async ({params, searchParams}: SetPageProps) => {
           {mostExpensiveOwned().cards.length > 0 ? (
             <MostExpensiveOwned cards={mostExpensiveOwned().cards}/>
           ) : null}
-          <CardTypeDistribution data={cardTypeDistribution()}  />
+          <CardSupertypeDistribution data={cardTypeDistribution()}  />
           <CardRarityDistribution data={cardRarityDistribution()}/>
         </ContextCarousel>
       </div>

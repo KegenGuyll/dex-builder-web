@@ -98,7 +98,7 @@ const CardSupertypeDistribution: React.FC<CardSupertypeDistributionProps> = ({da
     <Card className='h-56'>
       <CardBody>
         <div className="flex flex-col items-start gap-2 justify-center h-full">
-          <h4 className="flex-grow">Distribution By Kind</h4>
+          <h4 className="flex-grow">Distribution By Card type</h4>
           <Bar data={chartData} options={options} />
         </div>
       </CardBody>
