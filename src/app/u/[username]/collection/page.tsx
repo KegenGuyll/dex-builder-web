@@ -1,5 +1,5 @@
 import CardRarityDistribution, { CardRarityDistributionData } from "@/components/ContextCards/cardRarityDistrubution"
-import CardTypeDistribution, { CardTypeDistributionData } from "@/components/ContextCards/cardTypeDistribution"
+import CardSupertypeDistribution, { CardSupertypeDistributionData } from "@/components/ContextCards/cardSupertypeDistribution"
 import MostExpensiveCards, { MostExpensiveCard } from "@/components/ContextCards/mostExpensiveCards"
 import PersonalCollection from "@/components/ContextCards/personalCollection"
 import ContextCarousel from "@/components/ContextCarousel"
@@ -9,6 +9,7 @@ import findUserNetWorth from "@/endpoints/user/username/findNetWorth"
 import formatDollarAmount from "@/util/formatDollarAmount"
 import combineRarities from "@/util/combineRarities"
 import { BasicUserOwnedResponse } from "@/types/endpoints/owned"
+import CardTypeDistribution, { CardTypeDistributionData } from "@/components/ContextCards/cardTypeDistribution"
 
 type CollectionPageProps = {
   params: {
@@ -18,18 +19,6 @@ type CollectionPageProps = {
     name: string
     supertype: string
   }
-}
-
-const formatKey = (key: string): keyof BasicUserOwnedResponse => {
-  if(key === 'supertype') return 'cardSupertype';
-
-  if(key === 'rarity') return 'cardRarity';
-
-  if(key === 'name') return 'cardName';
-
-  if(key === 'types') return 'cardType';
-
-  return key as keyof BasicUserOwnedResponse;
 }
 
 type DynamicFilterSearchParams = {
@@ -93,6 +82,36 @@ const dynamicFilter = (
 }
 
 
+export async function generateMetadata({params}: CollectionPageProps) {
+  const [collectionResponse, netWorthResponse] = await Promise.all([
+    findUserCollection(params.username),
+    findUserNetWorth(params.username)
+  ])
+
+  const getUserCollection = () => {
+    if(!collectionResponse || 'error' in collectionResponse) return []
+
+    return collectionResponse
+  }
+
+  const getUserNetWorth = () => {
+    if(!netWorthResponse || 'error' in netWorthResponse) return {
+      cards: [],
+      totalAveragedNetWorth: 0
+    };
+
+    return netWorthResponse
+  }
+
+  
+  return {
+    title: `${params.username}'s Collection | DexBuilder`,
+    description: `View ${params.username}'s collection of TCG cards. 
+     They have ${getUserCollection().length} cards and a total market value of ${formatDollarAmount(getUserNetWorth().totalAveragedNetWorth)}`
+  }
+}
+
+
 const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => {
   const [collectionResponse, netWorthResponse] = await Promise.all([
     findUserCollection(params.username),
@@ -149,7 +168,7 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
     }))
   }
 
-  const cardTypeDistribution = (): CardTypeDistributionData[] => {
+  const cardSupertypeDistribution = (): CardSupertypeDistributionData[] => {
     const data = getUserCollection();
 
     if(data.length === 0) return []
@@ -206,7 +225,7 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
 
     return Object.keys(rarityDistribution)
       .sort((a, b) => {
-      const rarityOrder = ['Common', 'Uncommon', 'Rare', 'U Rare', 'S Rare'];
+      const rarityOrder = ['Common', 'Uncommon', 'Promo', 'Rare', 'U Rare', 'S Rare'];
       return rarityOrder.indexOf(a) - rarityOrder.indexOf(b);
       })
       .map(key => ({
@@ -214,6 +233,39 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
       count: rarityDistribution[key] as number
       }));
   }
+
+  const cardTypeDistribution = (): CardTypeDistributionData[] => {
+    const data = getUserCollection();
+
+    if(data.length === 0) return []
+
+    const types: string[] = [];
+    data.forEach(card => {
+      for (let i = 0; i < card.count; i++) {
+        card.cardType.forEach(type => {
+          types.push(type);
+        })
+      }
+    });
+
+    const typeDistribution = types.reduce((acc, type, currIndex) => {
+      if(acc[type]) {
+        acc[type] += 1
+      } else {
+        acc[type] = 1
+      }
+
+      return acc
+    }, {} as {[key: string]: number})
+
+    return Object.keys(typeDistribution).map(key => ({
+      type: key,
+      count: typeDistribution[key
+      ] as number
+    }))
+  }
+  
+
 
   return (
     <div  className="flex flex-col gap-4 lg:gap-8 mt-4 lg:items-center lg:justify-center w-full">
@@ -227,8 +279,9 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
             marketValue={formatDollarAmount(getMarketValue())}
           />
           <MostExpensiveCards cards={getMostExpensiveCards()} />
-          <CardTypeDistribution data={cardTypeDistribution()}/>
+          <CardSupertypeDistribution data={cardSupertypeDistribution()}/>
           <CardRarityDistribution data={cardRarityDistribution()}/>
+          <CardTypeDistribution data={cardTypeDistribution()} />
         </ContextCarousel>
       </div>
 
@@ -240,6 +293,11 @@ const CollectionPage = async ({ params, searchParams }: CollectionPageProps) => 
               src={card.images.large} 
               cardName={card.cardName} 
             />
+            {card.count > 1 && (
+              <div className="h-6 w-6 bg-default p-3 rounded-full flex justify-center items-center absolute z-30 right-3 top-1">
+                <span className="text-white text-xs">{card.count}</span>
+              </div>
+            )}
           </div>
         ))}
       </div>
