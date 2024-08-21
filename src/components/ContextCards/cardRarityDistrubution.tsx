@@ -18,15 +18,6 @@ import { Bar } from 'react-chartjs-2';
 
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-type CardTypeDistributionData = {
-  kind: string,
-  count: number
-}
-
-type CardTypeDistributionProps = {
-  data: CardTypeDistributionData[]
-}
-
  ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -49,29 +40,6 @@ type CardRarityDistributionProps = {
 
 
 const CardRarityDistribution: React.FC<CardRarityDistributionProps>  = ({data}: CardRarityDistributionProps) => {
-  
-  const convertRarityToSymbol = (rarity: string) => {
-    
-    if(rarity.includes('Common')) return 'Common'
-
-    if(rarity.includes('Uncommon')) return 'Uncommon'
-
-    if(rarity.includes('Rare Ultra')) return 'U Rare'
-
-    if(rarity.includes('Rare Secret')) return 'S Rare'
-
-    return 'Rare'
-  }
-
-  const labels = useMemo(() => {
-
-    const labels = data.map(d => convertRarityToSymbol(d.rarity))
-
-    // make sure label are unique
-    return labels.filter((value, index, self) => self.indexOf(value) === index)
-
-  }, [data])
-
   const options: ChartOptions<'bar'> = useMemo(() => ({
       responsive: true,
       plugins: {
@@ -105,8 +73,9 @@ const CardRarityDistribution: React.FC<CardRarityDistributionProps>  = ({data}: 
           display: false,
         },
       }
-    }), []);
-  
+    }), []
+  );
+ 
   const chartData: ChartData<'bar', number[]> = useMemo(() => ({
     labels: data.map(d => d.rarity),
     datasets: [
@@ -130,7 +99,7 @@ const CardRarityDistribution: React.FC<CardRarityDistributionProps>  = ({data}: 
     <Card className='h-56'>
       <CardBody>
         <div className="flex flex-col items-start gap-2 justify-center h-full">
-          <h4 className="flex-grow">Distribution By Kind</h4>
+          <h4 className="flex-grow">Distribution By Rarity</h4>
           <Bar data={chartData} options={options} />
         </div>
       </CardBody>
